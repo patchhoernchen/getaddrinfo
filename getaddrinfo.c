@@ -6,6 +6,9 @@
 #include <unistd.h>
 
 
+#define USAGE fprintf(stderr, "Usage: %s [-468tu] HOST [PORT]\n", argv[0])
+
+
 struct params {
     char *hostname;
     char *service;
@@ -15,16 +18,16 @@ struct params {
     int family;
 };
 
+
 void run(struct params hostspec);
+
 
 int main(int argc, char **argv) {
 
-    /*
-    if ( argc < 3 ) {
-        fprintf(stderr, "Usage: %s host port\n", argv[0]);
-        exit(EXIT_FAILURE);
+    if ( argc < 2 ) {
+        //fprintf(stderr, "Usage: %s host port\n", argv[0]);
+        USAGE; exit(EXIT_FAILURE);
     }
-    */
 
     struct params hostspec;
     hostspec.hostname = "\0";
@@ -38,7 +41,7 @@ int main(int argc, char **argv) {
     char opt;
 
     //while ( (opt = getopt(argc, argv, "468tuPp:")) != -1 ) {
-    while ( (opt = getopt(argc, argv, "468tu")) != -1 ) {
+    while ( (opt = getopt(argc, argv, "468tuh")) != -1 ) {
         switch (opt) {
             case '4': hostspec.family = AF_INET; break;
             case '6': hostspec.family = AF_INET6; break;
@@ -47,6 +50,8 @@ int main(int argc, char **argv) {
             case 'u': hostspec.type = SOCK_DGRAM; break;
             //case 'P': hostspec.passive = AI_PASSIVE; break;
             //case 'p': hostspec.protocol = atoi(optarg); break;
+            case 'h': USAGE; exit(EXIT_SUCCESS);
+            default: USAGE; exit(EXIT_FAILURE);
         }
     }
 
@@ -57,13 +62,13 @@ int main(int argc, char **argv) {
         hostspec.hostname = argv[optind];
         hostspec.service = argv[optind+1];
     } else {
-        exit(-1);
+        USAGE; exit(EXIT_FAILURE);
     }
 
-    //printf("DEBUG: %s:%s\n", hostspec.hostname, hostspec.service);
     run(hostspec);
     return 0;
 }
+
 
 void run(struct params hostspec) {
 
@@ -71,14 +76,9 @@ void run(struct params hostspec) {
     struct addrinfo *result, *rp;
 
     memset(&hints, 0, sizeof(hints));
-    //hints.ai_family = AF_UNSPEC;
     hints.ai_family = hostspec.family;
-    //hints.ai_socktype = SOCK_STREAM;
-    //hints.ai_socktype = SOCK_DGRAM;
     hints.ai_socktype = hostspec.type;
-    //hints.ai_flags = AI_PASSIVE;
     hints.ai_flags = hostspec.passive;
-    //hints.ai_protocol = 0;
     hints.ai_protocol = hostspec.protocol;
 
     int ret = getaddrinfo(hostspec.hostname, hostspec.service, &hints, &result);
