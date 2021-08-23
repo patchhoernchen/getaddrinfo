@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 
-#define USAGE(output) fprintf(output, "Usage: %s [-468tu] HOST [PORT]\n", argv[0])
+#define USAGE(output) fprintf((output), "Usage: %s [-468tu] HOST [PORT]\n", argv[0])
 
 
 struct params {
