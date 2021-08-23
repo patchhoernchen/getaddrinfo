@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 
-#define USAGE fprintf(stderr, "Usage: %s [-468tu] HOST [PORT]\n", argv[0])
+#define USAGE(output) fprintf(output, "Usage: %s [-468tu] HOST [PORT]\n", argv[0])
 
 
 struct params {
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
 
     if ( argc < 2 ) {
         //fprintf(stderr, "Usage: %s host port\n", argv[0]);
-        USAGE; exit(EXIT_FAILURE);
+        USAGE(stderr); exit(EXIT_FAILURE);
     }
 
     struct params hostspec;
@@ -50,8 +50,8 @@ int main(int argc, char **argv) {
             case 'u': hostspec.type = SOCK_DGRAM; break;
             //case 'P': hostspec.passive = AI_PASSIVE; break;
             //case 'p': hostspec.protocol = atoi(optarg); break;
-            case 'h': USAGE; exit(EXIT_SUCCESS);
-            default: USAGE; exit(EXIT_FAILURE);
+            case 'h': USAGE(stdout); exit(EXIT_SUCCESS);
+            default: USAGE(stderr); exit(EXIT_FAILURE);
         }
     }
 
@@ -62,7 +62,7 @@ int main(int argc, char **argv) {
         hostspec.hostname = argv[optind];
         hostspec.service = argv[optind+1];
     } else {
-        USAGE; exit(EXIT_FAILURE);
+        USAGE(stderr); exit(EXIT_FAILURE);
     }
 
     run(hostspec);
